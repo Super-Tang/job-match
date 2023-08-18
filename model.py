@@ -18,7 +18,6 @@ class RankNet(nn.Module):
             nn.Sigmoid()
         ).to(self.device)
 
-
     def forward(self, input_ids0, input_mask0, segment_ids0, input_ids1, input_mask1, segment_ids1, label_id=None):
         input_ids0 = input_ids0.to(self.device)
         input_mask0 = input_mask0.to(self.device)

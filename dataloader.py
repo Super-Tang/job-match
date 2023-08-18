@@ -1,10 +1,11 @@
-from torch.utils.data import Dataset
 import json
+
 import torch
+from torch.utils.data import Dataset
 
 
 class InputExample:
-    def __init__(self, task, text1, text2, label):
+    def __init__(self, task, text1, text2=None, label=None):
         self.task = task
         self.text1 = text1
         self.text2 = text2
@@ -21,7 +22,7 @@ class InputFeatures:
 
 class DataPreprocessor:
     def get_train_examples(self, path):
-        df = json.load(open(path,  'r', encoding='utf-8'))
+        df = json.load(open(path, 'r', encoding='utf-8'))
         return self._create_examples(df)
 
     def get_labels(self):
@@ -31,11 +32,12 @@ class DataPreprocessor:
         examples = []
         for row in data:
             task = row['job_description']
-            text1 = row['item1']
+            text1 = row['item1'],
             text2 = row['item2']
             label = row['label']
             examples.append(InputExample(task, text1, text2, label))
         return examples
+
 
 def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer):
     if label_list is not None:
@@ -54,12 +56,12 @@ def convert_examples_to_features(examples, label_list, max_seq_length, tokenizer
                                              return_attention_mask=True)
 
         encode_dict2 = tokenizer.encode_plus(example.task, example.text2,
-                                     max_length=max_seq_length,
-                                     truncation=True,
-                                     add_special_tokens=True,
-                                     pad_to_max_length=True,
-                                     return_token_type_ids=True,
-                                     return_attention_mask=True)
+                                             max_length=max_seq_length,
+                                             truncation=True,
+                                             add_special_tokens=True,
+                                             pad_to_max_length=True,
+                                             return_token_type_ids=True,
+                                             return_attention_mask=True)
 
         input_ids = [encode_dict1['input_ids'], encode_dict2['input_ids']]
         input_mask = [encode_dict1['attention_mask'], encode_dict2['attention_mask']]
@@ -88,12 +90,11 @@ class MyDataset(Dataset):
             'input_mask0': self.input_mask0[index],
             'segment_ids0': self.segment_ids0[index],
             'input_ids1': self.input_ids1[index],
-            'input_mask1':self.input_mask1[index],
-            'segment_ids1':self.segment_ids1[index],
+            'input_mask1': self.input_mask1[index],
+            'segment_ids1': self.segment_ids1[index],
             'label_id': self.label_id[index]
         }
         return data
 
     def __len__(self):
         return len(self.label_id)
-
